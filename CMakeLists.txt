@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-Wall -Wextra -Werror -Wpedantic)
 
 add_library(gps_lib src/lib/gps_lib.cpp)
-target_include_directories(gps_lib PRIVATE src/include)
+target_include_directories(gps_lib PUBLIC src/include)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
