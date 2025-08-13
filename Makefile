@@ -12,6 +12,9 @@ project:
 start:
 	./$(BUILD)/$(PROJECT)
 
+documentation:
+	cmake --build $(BUILD) --target docs
+
 test:
 	ctest --test-dir $(BUILD)
 

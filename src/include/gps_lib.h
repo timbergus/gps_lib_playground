@@ -11,168 +11,180 @@
 #include <variant>
 #include <vector>
 
+/**
+ * @namespace gps_lib
+ * @brief A header-only C++ library for parsing and processing NMEA GPS
+ * sentences.
+ */
 namespace gps_lib {
 
 /**
- * This are the speed units in meters per second and kilometers per hour.
- *
- * @var enum
+ * @brief This enum represents the speed units in meters per second and
+ * kilometers per hour.
  */
-enum Units { ms, kmh };
-
-/**
- * This enum represents the number of tokens for each NMEA sentence type.
- *
- * @var enum
- */
-enum NumTokens {
-  GGA_T = 15,
-  GLL_T = 7,
-  GSA_T = 18,
-  GSV_T = 4,
-  RMC_T = 12,
-  VTG_T = 10,
-  ZDA_T = 7
+enum Units {
+  ms, ///< Meters per second
+  kmh ///< Kilometers per hour
 };
 
 /**
- * This constant represents the conversion factor from knots to meters per
- * second.
- *
- * @var constexpr
+ * @brief This enum represents the number of tokens for each NMEA sentence type.
+ */
+enum NumTokens {
+  GGA_T = 15, ///< Number of tokens for GGA sentence
+  GLL_T = 7,  ///< Number of tokens for GLL sentence
+  GSA_T = 18, ///< Number of tokens for GSA sentence
+  GSV_T = 4,  ///< Number of tokens for GSV sentence
+  RMC_T = 12, ///< Number of tokens for RMC sentence
+  VTG_T = 10, ///< Number of tokens for VTG sentence
+  ZDA_T = 7   ///< Number of tokens for ZDA sentence
+};
+
+/**
+ * @brief This constant represents the conversion factor from knots to meters
+ * per second.
  */
 constexpr double KNTOMS{0.514444444};
 
 /**
- * This constant represents the conversion factor from knots to kilometers per
- * hour.
- *
- * @var constexpr
+ * @brief This constant represents the conversion factor from knots to
+ * kilometers per hour.
  */
 constexpr double KNTOKMH{1.85};
 
 /**
- * This struct represents the latitude in a GPS coordinate.
+ * @brief Stores the latitude value in decimal degrees and direction ('N' or
+ * 'S').
  */
 struct Latitude {
-  double value;
-  char direction; // 'N' or 'S'
+  double value;   ///< Latitude in decimal degrees.
+  char direction; ///< Direction of latitude ('N' or 'S').
 };
 
 /**
- * This struct represents the longitude in a GPS coordinate.
+ * @brief This struct represents the longitude in a GPS coordinate.
  */
 struct Longitude {
-  double value;
-  char direction; // 'E' or 'W'
+  double value;   ///< Longitude in decimal degrees.
+  char direction; ///< Direction of longitude ('E' or 'W').
 };
 
 /**
- * This struct represents the GGA (Global Positioning System Fix Data) sentence.
+ * @brief This struct represents the GGA (Global Positioning System Fix Data)
+ * sentence.
  */
 struct GGA {
-  std::string type;
-  std::string utc_time;
-  Latitude latitude;
-  Longitude longitude;
-  std::string quality;
-  std::string satellites_used;
-  std::string hdop;
-  std::string altitude;
-  std::string geoidal_separation;
-  std::string dgps;
+  std::string type;     ///< Type of the NMEA sentence (GGA).
+  std::string utc_time; ///< UTC time in the format HHMMSS.
+  Latitude
+      latitude; ///< Latitude in decimal degrees and direction ('N' or 'S').
+  Longitude
+      longitude; ///< Longitude in decimal degrees and direction ('E' or 'W').
+  std::string quality;            ///< GPS fix quality indicator.
+  std::string satellites_used;    ///< Number of satellites used for the fix.
+  std::string hdop;               ///< Horizontal dilution of precision.
+  std::string altitude;           ///< Altitude in meters.
+  std::string geoidal_separation; ///< Geoidal separation in meters.
+  std::string dgps;               ///< Differential GPS data.
 };
 
 /**
- * This struct represents the GLL (Geographic Latitude and Longitude) sentence.
+ * @brief This struct represents the GLL (Geographic Latitude and Longitude)
+ * sentence.
  */
 struct GLL {
-  std::string type;
-  Latitude latitude;
-  Longitude longitude;
-  std::string utc_time;
-  std::string status;
+  std::string type; ///< Type of the NMEA sentence (GLL).
+  Latitude
+      latitude; ///< Latitude in decimal degrees and direction ('N' or 'S').
+  Longitude
+      longitude; ///< Longitude in decimal degrees and direction ('E' or 'W').
+  std::string utc_time; ///< UTC time in the format HHMMSS.
+  std::string status;   ///< Status of the fix ('A' for active, 'V' for void).
 };
 
 /**
- * This struct represents the GSA (GNSS DOP and Active Satellites) sentence.
+ * @brief This struct represents the GSA (GNSS DOP and Active Satellites)
+ * sentence.
  */
 struct GSA {
-  std::string type;
-  std::string mode;
-  std::string fix_type;
-  std::vector<std::string> satellites;
-  std::string pdop;
-  std::string hdop;
-  std::string vdop;
-  std::string checksum;
+  std::string type;     ///< Type of the NMEA sentence (GSA).
+  std::string mode;     ///< Mode (1 = no fix, 2 = 2D fix, 3 = 3D fix).
+  std::string fix_type; ///< Fix type (0 = no fix, 1 = GPS fix, 2 = DGPS fix).
+  std::vector<std::string> satellites; ///< List of satellites used for the fix.
+  std::string pdop;                    ///< Position dilution of precision.
+  std::string hdop;                    ///< Horizontal dilution of precision.
+  std::string vdop;                    ///< Vertical dilution of precision.
+  std::string checksum;                ///< Checksum for the sentence.
 };
 
 /**
- * This struct represents a satellite in the GPS system.
+ * @brief This struct represents a satellite in the GPS system.
  */
 struct Satellite {
-  std::string id;
-  std::string elevation;
-  std::string azimuth;
-  std::string snr;
+  std::string id;        ///< Satellite ID.
+  std::string elevation; ///< Satellite elevation in degrees.
+  std::string azimuth;   ///< Satellite azimuth in degrees.
+  std::string snr;       ///< Satellite signal-to-noise ratio.
 };
 
 /**
- * This struct represents the GSV (GNSS Satellites in View) sentence.
+ * @brief This struct represents the GSV (GNSS Satellites in View) sentence.
  */
 struct GSV {
-  std::string type;
-  std::string number_of_messages;
-  std::string sequence_number;
-  std::string satellites_in_view;
-  std::vector<Satellite> satellites;
+  std::string type;                  ///< Type of the NMEA sentence (GSV).
+  std::string number_of_messages;    ///< Total number of messages.
+  std::string sequence_number;       ///< Sequence number of this message.
+  std::string satellites_in_view;    ///< Number of satellites in view.
+  std::vector<Satellite> satellites; ///< List of satellites.
 };
 
 /**
- * This struct represents the RMC (Recommended Minimum Specific GPS/Transit
- * Data) sentence.
+ * @brief This struct represents the RMC (Recommended Minimum Specific
+ * GPS/Transit Data) sentence.
  */
 struct RMC {
-  std::string type;
-  std::string utc_time;
-  std::string status;
-  Latitude latitude;
-  Longitude longitude;
-  std::string speed;
-  std::string course;
-  std::string utc_date;
-  std::string mode;
+  std::string type;     ///< Type of the NMEA sentence (RMC).
+  std::string utc_time; ///< UTC time in the format HHMMSS.
+  std::string status;   ///< Status of the fix ('A' for active, 'V' for void).
+  Latitude
+      latitude; ///< Latitude in decimal degrees and direction ('N' or 'S').
+  Longitude
+      longitude; ///< Longitude in decimal degrees and direction ('E' or 'W').
+  std::string speed;    ///< Speed over ground in knots.
+  std::string course;   ///< Course over ground in degrees.
+  std::string utc_date; ///< UTC date in the format DDMMYY.
+  std::string mode; ///< Mode (A = autonomous, D = differential, E = estimated).
 };
 
 /**
- * This struct represents the VTG (Course Over Ground and Ground Speed)
+ * @brief This struct represents the VTG (Course Over Ground and Ground Speed)
  * sentence.
  */
 struct VTG {
-  std::string type;
-  std::string course;
-  std::string course_magnetic;
-  std::string speed_kn;
-  std::string speed_kh;
-  std::string mode;
+  std::string type;            ///< Type of the NMEA sentence (VTG).
+  std::string course;          ///< Course over ground in degrees.
+  std::string course_magnetic; ///< Magnetic course in degrees.
+  std::string speed_kn;        ///< Speed over ground in knots.
+  std::string speed_kh;        ///< Speed over ground in kilometers per hour.
+  std::string mode; ///< Mode (A = autonomous, D = differential, E = estimated).
 };
 
 /**
- * This struct represents the ZDA (Time and Date) sentence.
+ * @brief This struct represents the ZDA (Time and Date) sentence.
  */
 struct ZDA {
-  std::string type;
-  std::string utc_time;
-  std::string utc_day;
-  std::string utc_month;
-  std::string utc_year;
-  std::string local_zone_hours;
-  std::string local_zone_minutes;
+  std::string type;               ///< Type of the NMEA sentence (ZDA).
+  std::string utc_time;           ///< UTC time in the format HHMMSS.
+  std::string utc_day;            ///< UTC day.
+  std::string utc_month;          ///< UTC month.
+  std::string utc_year;           ///< UTC year.
+  std::string local_zone_hours;   ///< Local zone hours.
+  std::string local_zone_minutes; ///< Local zone minutes.
 };
 
 /**
- * Splits a string_view into a vector of string_views based on a separator.
+ * @brief Splits a string_view into a vector of string_views based on a
+ * separator.
  *
  * @return  std::vector<std::string_view>  A vector containing the split tokens.
  */
@@ -238,30 +250,25 @@ inline bool is_valid_sample(const std::string_view sample) {
 }
 
 /**
- * This enum represents the various parsing errors that can occur.
- *
- * @var enum
+ * @brief This enum represents the various parsing errors that can occur.
  */
 enum ParseError {
-  InvalidDirection,
-  InvalidFormat,
-  MissingFields,
-  UnknownError,
-  UnsupportedType,
+  InvalidDirection, ///< Invalid direction in latitude or longitude.
+  InvalidFormat,    ///< Invalid format of the NMEA sentence.
+  MissingFields,    ///< Missing fields in the NMEA sentence.
+  UnknownError,     ///< An unknown error occurred.
+  UnsupportedType,  ///< The NMEA sentence type is not supported.
 };
 
 /**
- * This variant represents a sample NMEA sentence.
- *
- * @var using
+ * @brief This variant represents a sample NMEA sentence.
  */
 using Sample = std::variant<GGA, GLL, GSA, GSV, RMC, VTG, ZDA>;
 
 template <typename T>
 concept StringLike = std::convertible_to<T, std::string_view>;
 /**
- * Parses a given NMEA sentence and returns a Sample variant.
- *
+ * @brief Parses a given NMEA sentence and returns a Sample variant.
  * @param sample  The NMEA sentence to parse.
  * @return std::expected<Sample, ParseError>  An expected containing the parsed
  * Sample or an error.
@@ -290,7 +297,11 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
     data.type = tokens.at(0);
     data.utc_time = tokens.at(1);
 
-    data.latitude.value = std::stod(std::string{tokens.at(2)});
+    try {
+      data.latitude.value = std::stod(std::string{tokens.at(2)});
+    } catch (...) {
+      return std::unexpected{MissingFields};
+    }
     if (!tokens.at(3).empty() &&
         (tokens.at(3).front() == 'N' || tokens.at(3).front() == 'S')) {
       data.latitude.direction = tokens.at(3).front();
@@ -298,7 +309,11 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
       return std::unexpected{ParseError::InvalidDirection};
     }
 
-    data.longitude.value = std::stod(std::string{tokens.at(4)});
+    try {
+      data.longitude.value = std::stod(std::string{tokens.at(4)});
+    } catch (...) {
+      return std::unexpected{MissingFields};
+    }
     if (!tokens.at(5).empty() &&
         (tokens.at(5).front() == 'E' || tokens.at(5).front() == 'W')) {
       data.longitude.direction = tokens.at(5).front();
@@ -323,7 +338,11 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
 
     data.type = tokens.at(0);
 
-    data.latitude.value = std::stod(std::string{tokens.at(1)});
+    try {
+      data.latitude.value = std::stod(std::string{tokens.at(1)});
+    } catch (...) {
+      return std::unexpected{MissingFields};
+    }
     if (!tokens.at(2).empty() &&
         (tokens.at(2).front() == 'N' || tokens.at(2).front() == 'S')) {
       data.latitude.direction = tokens.at(2).front();
@@ -331,7 +350,11 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
       return std::unexpected{ParseError::InvalidDirection};
     }
 
-    data.longitude.value = std::stod(std::string{tokens.at(3)});
+    try {
+      data.longitude.value = std::stod(std::string{tokens.at(3)});
+    } catch (...) {
+      return std::unexpected{MissingFields};
+    }
     if (!tokens.at(4).empty() &&
         (tokens.at(4).front() == 'E' || tokens.at(4).front() == 'W')) {
       data.longitude.direction = tokens.at(4).front();
@@ -375,17 +398,21 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
     data.sequence_number = tokens.at(2);
     data.satellites_in_view = tokens.at(3);
 
-    data.satellites.reserve(std::stoi(data.number_of_messages));
+    try {
+      data.satellites.reserve(std::stoi(data.number_of_messages));
+    } catch (...) {
+      return std::unexpected{MissingFields};
+    }
 
     for (int i = 1; i <= std::stoi(data.number_of_messages) &&
                     static_cast<size_t>(i * 4 + 3) < tokens.size();
          ++i) {
       Satellite satellite;
 
-      satellite.id = tokens[i * 4 + 0];
-      satellite.elevation = tokens[i * 4 + 1];
-      satellite.azimuth = tokens[i * 4 + 2];
-      satellite.snr = tokens[i * 4 + 3];
+      satellite.id = tokens[i * 4 + 4];
+      satellite.elevation = tokens[i * 4 + 5];
+      satellite.azimuth = tokens[i * 4 + 6];
+      satellite.snr = tokens[i * 4 + 7];
 
       data.satellites.push_back(satellite);
     }
@@ -402,7 +429,11 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
     data.utc_time = tokens.at(1);
     data.status = tokens.at(2);
 
-    data.latitude.value = std::stod(std::string{tokens.at(3)});
+    try {
+      data.latitude.value = std::stod(std::string{tokens.at(3)});
+    } catch (...) {
+      return std::unexpected{MissingFields};
+    }
     if (!tokens.at(4).empty() &&
         (tokens.at(4).front() == 'N' || tokens.at(4).front() == 'S')) {
       data.latitude.direction = tokens.at(4).front();
@@ -410,7 +441,11 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
       return std::unexpected{ParseError::InvalidDirection};
     }
 
-    data.longitude.value = std::stod(std::string{tokens.at(5)});
+    try {
+      data.longitude.value = std::stod(std::string{tokens.at(5)});
+    } catch (...) {
+      return std::unexpected{MissingFields};
+    }
     if (!tokens.at(6).empty() &&
         (tokens.at(6).front() == 'E' || tokens.at(6).front() == 'W')) {
       data.longitude.direction = tokens.at(6).front();
@@ -461,8 +496,7 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
 }
 
 /**
- * Parses a UTC date string in the format DDMMYY.
- *
+ * @brief Parses a UTC date string in the format DDMMYY.
  * @return  auto    A tuple containing the day, month, and year as strings.
  */
 inline auto parse_utc_date(const std::string utc_date) {
@@ -474,8 +508,7 @@ inline auto parse_utc_date(const std::string utc_date) {
 }
 
 /**
- * Parses a UTC time string in the format HHMMSS.
- *
+ * @brief Parses a UTC time string in the format HHMMSS.
  * @return  auto    A tuple containing the hours, minutes, and seconds as
  * strings.
  */
@@ -488,8 +521,7 @@ inline auto parse_utc_time(const std::string utc_time) {
 }
 
 /**
- * Parses a latitude string in the format DDMM.MMMM.
- *
+ * @brief Parses a latitude string in the format DDMM.MMMM.
  * @return  double  The parsed latitude in decimal degrees.
  */
 inline double parse_latitude(const std::string latitude) {
@@ -497,8 +529,7 @@ inline double parse_latitude(const std::string latitude) {
 }
 
 /**
- * Parses a longitude string in the format DDDMM.MMMM.
- *
+ * @brief Parses a longitude string in the format DDDMM.MMMM.
  * @return  double  The parsed longitude in decimal degrees.
  */
 inline double parse_longitude(const std::string longitude,
@@ -508,8 +539,7 @@ inline double parse_longitude(const std::string longitude,
 }
 
 /**
- * Parses a speed string in the format DDD.DD.
- *
+ * @brief Parses a speed string in the format DDD.DD.
  * @return  double  The parsed speed in knots.
  */
 inline double parse_speed(const std::string speed, Units units) {
@@ -518,8 +548,7 @@ inline double parse_speed(const std::string speed, Units units) {
 }
 
 /**
- * Prints the GGA data.
- *
+ * @brief Prints the GGA data.
  * @return  void    This function does not return a value.
  */
 inline void print_gga(GGA data) {
@@ -531,8 +560,7 @@ inline void print_gga(GGA data) {
 }
 
 /**
- * Prints the GSA data.
- *
+ * @brief Prints the GSA data.
  * @return  void    This function does not return a value.
  */
 inline void print_gsa(GSA data) {
@@ -544,8 +572,7 @@ inline void print_gsa(GSA data) {
 }
 
 /**
- * Prints the GSV data.
- *
+ * @brief Prints the GSV data.
  * @return  void    This function does not return a value.
  */
 inline void print_gsv(GSV data) {
@@ -560,8 +587,7 @@ inline void print_gsv(GSV data) {
 }
 
 /**
- * Prints the GLL data.
- *
+ * @brief Prints the GLL data.
  * @return  void    This function does not return a value.
  */
 inline void print_gll(GLL data) {
@@ -571,8 +597,7 @@ inline void print_gll(GLL data) {
 }
 
 /**
- * Prints the RMC data.
- *
+ * @brief Prints the RMC data.
  * @return  void    This function does not return a value.
  */
 inline void print_rmc(RMC data) {
@@ -583,8 +608,7 @@ inline void print_rmc(RMC data) {
 }
 
 /**
- * Prints the VTG data.
- *
+ * @brief Prints the VTG data.
  * @return  void    This function does not return a value.
  */
 inline void print_vtg(VTG data) {
@@ -592,8 +616,7 @@ inline void print_vtg(VTG data) {
 }
 
 /**
- * Prints the ZDA data.
- *
+ * @brief Prints the ZDA data.
  * @return  void    This function does not return a value.
  */
 inline void print_zda(ZDA data) {
@@ -603,8 +626,7 @@ inline void print_zda(ZDA data) {
 }
 
 /**
- * Prints the parsed sample data.
- *
+ * @brief Prints the parsed sample data.
  * @return  void    This function does not return a value.
  */
 inline void print_samples(const std::expected<Sample, ParseError> &sample) {
