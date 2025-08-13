@@ -14,6 +14,18 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gps_lib)
 
+# >>> JSON setup
+
+find_package(nlohmann_json CONFIG QUIET)
+
+if (nlohmann_json_FOUND)
+    target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+else()
+    message(WARNING "nlohmann_json not found, JSON support will not be available")
+endif()
+
+# <<< JSON setup
+
 # >>> Doxygen setup
 
 find_package(Doxygen)
