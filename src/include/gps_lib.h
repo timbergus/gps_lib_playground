@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <expected>
 #include <iomanip>
+#include <nlohmann/json.hpp>
 #include <print>
 #include <sstream>
 #include <string>
@@ -298,7 +299,7 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
     data.utc_time = tokens.at(1);
 
     try {
-      data.latitude.value = std::stod(std::string{tokens.at(2)});
+      data.latitude.value = std::stod(std::string{tokens.at(2)}) / 100.0;
     } catch (...) {
       return std::unexpected{MissingFields};
     }
@@ -309,16 +310,18 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
       return std::unexpected{ParseError::InvalidDirection};
     }
 
-    try {
-      data.longitude.value = std::stod(std::string{tokens.at(4)});
-    } catch (...) {
-      return std::unexpected{MissingFields};
-    }
     if (!tokens.at(5).empty() &&
         (tokens.at(5).front() == 'E' || tokens.at(5).front() == 'W')) {
       data.longitude.direction = tokens.at(5).front();
     } else {
       return std::unexpected{ParseError::InvalidDirection};
+    }
+    try {
+      double sign = data.longitude.direction == 'W' ? -1.0 : 1.0;
+      data.longitude.value =
+          std::stod(std::string{tokens.at(4)}) / 100.0 * sign;
+    } catch (...) {
+      return std::unexpected{MissingFields};
     }
 
     data.quality = tokens.at(6);
@@ -339,7 +342,7 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
     data.type = tokens.at(0);
 
     try {
-      data.latitude.value = std::stod(std::string{tokens.at(1)});
+      data.latitude.value = std::stod(std::string{tokens.at(1)}) / 100.0;
     } catch (...) {
       return std::unexpected{MissingFields};
     }
@@ -350,16 +353,18 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
       return std::unexpected{ParseError::InvalidDirection};
     }
 
-    try {
-      data.longitude.value = std::stod(std::string{tokens.at(3)});
-    } catch (...) {
-      return std::unexpected{MissingFields};
-    }
     if (!tokens.at(4).empty() &&
         (tokens.at(4).front() == 'E' || tokens.at(4).front() == 'W')) {
       data.longitude.direction = tokens.at(4).front();
     } else {
       return std::unexpected{ParseError::InvalidDirection};
+    }
+    try {
+      double sign = data.longitude.direction == 'W' ? -1.0 : 1.0;
+      data.longitude.value =
+          std::stod(std::string{tokens.at(3)}) / 100.0 * sign;
+    } catch (...) {
+      return std::unexpected{MissingFields};
     }
 
     data.utc_time = tokens.at(6);
@@ -430,7 +435,7 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
     data.status = tokens.at(2);
 
     try {
-      data.latitude.value = std::stod(std::string{tokens.at(3)});
+      data.latitude.value = std::stod(std::string{tokens.at(3)}) / 100.0;
     } catch (...) {
       return std::unexpected{MissingFields};
     }
@@ -441,16 +446,18 @@ inline std::expected<Sample, ParseError> parse(StringLike auto const &sample) {
       return std::unexpected{ParseError::InvalidDirection};
     }
 
-    try {
-      data.longitude.value = std::stod(std::string{tokens.at(5)});
-    } catch (...) {
-      return std::unexpected{MissingFields};
-    }
     if (!tokens.at(6).empty() &&
         (tokens.at(6).front() == 'E' || tokens.at(6).front() == 'W')) {
       data.longitude.direction = tokens.at(6).front();
     } else {
       return std::unexpected{ParseError::InvalidDirection};
+    }
+    try {
+      double sign = data.longitude.direction == 'W' ? -1.0 : 1.0;
+      data.longitude.value =
+          std::stod(std::string{tokens.at(5)}) / 100.0 * sign;
+    } catch (...) {
+      return std::unexpected{MissingFields};
     }
 
     data.speed = tokens.at(7);
@@ -521,24 +528,6 @@ inline auto parse_utc_time(const std::string utc_time) {
 }
 
 /**
- * @brief Parses a latitude string in the format DDMM.MMMM.
- * @return  double  The parsed latitude in decimal degrees.
- */
-inline double parse_latitude(const std::string latitude) {
-  return std::stod(std::string{latitude}) / 100.0;
-}
-
-/**
- * @brief Parses a longitude string in the format DDDMM.MMMM.
- * @return  double  The parsed longitude in decimal degrees.
- */
-inline double parse_longitude(const std::string longitude,
-                              const std::string longitude_direction) {
-  double sign = longitude_direction == "W" ? -1.0 : 1.0;
-  return sign * std::stod(std::string{longitude}) / 100.0;
-}
-
-/**
  * @brief Parses a speed string in the format DDD.DD.
  * @return  double  The parsed speed in knots.
  */
@@ -546,6 +535,8 @@ inline double parse_speed(const std::string speed, Units units) {
   double velocity = std::stod(std::string{speed});
   return units == ms ? velocity * KNTOMS : velocity * KNTOKMH;
 }
+
+// PRINT FUNCTIONS
 
 /**
  * @brief Prints the GGA data.
@@ -657,5 +648,7 @@ inline void print_samples(const std::expected<Sample, ParseError> &sample) {
         },
         sample.value());
   }
+
+  // JSON EXPORT FUNCTIONS
 }
 } // namespace gps_lib
