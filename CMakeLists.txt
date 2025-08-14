@@ -7,24 +7,28 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_compile_options(-Wall -Wextra -Werror -Wpedantic)
 
+include(FetchContent)
+
+# >>> JSON download
+
+FetchContent_Declare(
+  nlohmann_json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG v3.12.0
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
+# <<< JSON download
+
 add_library(gps_lib INTERFACE)
 target_include_directories(gps_lib INTERFACE src/include)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE gps_lib)
-
-# >>> JSON setup
-
-find_package(nlohmann_json CONFIG QUIET)
-
-if (nlohmann_json_FOUND)
-    target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
-else()
-    message(WARNING "nlohmann_json not found, JSON support will not be available")
-endif()
-
-# <<< JSON setup
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  gps_lib
+  nlohmann_json::nlohmann_json
+)
 
 # >>> Doxygen setup
 
