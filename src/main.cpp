@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <filesystem>
 #include <print>
 
 #include "json.h"
@@ -7,7 +8,10 @@
 #include "tools.h"
 
 int main() {
-  std::ifstream file{"data/samples.txt"};
+  std::filesystem::path exe_path = std::filesystem::current_path();
+
+  std::filesystem::path data_file = exe_path / "data/samples.txt";
+  std::ifstream file{data_file};
 
   if (!file) {
     std::println("Could not open file.");
@@ -31,7 +35,8 @@ int main() {
   auto parsed_sample = gps_lib::parse(sample);
 
   if (parsed_sample) {
-    gps_lib::save_to_json(*parsed_sample, "data/sample.json");
+    std::filesystem::path data_file = exe_path / "data/sample.json";
+    gps_lib::save_to_json(*parsed_sample, data_file);
   } else {
     std::println("Failed to parse sample for JSON export.");
   }

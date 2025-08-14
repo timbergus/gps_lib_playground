@@ -54,6 +54,16 @@ if (DOXYGEN_FOUND)
         COMMENT "Generating Doxygen documentation in ${DOXYGEN_OUTPUT_DIR}"
         VERBATIM
     )
+
+    install(DIRECTORY ${DOXYGEN_OUTPUT_DIR}/html/
+      DESTINATION docs
+      COMPONENT docs
+    )
+
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/
+      DESTINATION bin/data
+      COMPONENT runtime
+    )
 else()
     message(WARNING "Doxygen not found, documentation target will not be available")
 endif()
@@ -63,6 +73,14 @@ endif()
 include(CTest)
 enable_testing()
 
+include(InstallRequiredSystemLibraries)
+
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GPS Library Playground")
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_VENDOR "Gustavo Muñoz")
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PROJECT_NAME}-${CPACK_PROJECT_VERSION}")
 include(CPack)

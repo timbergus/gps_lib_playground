@@ -6,17 +6,20 @@ init:
   	-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang \
   	-DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm/bin/clang++
 
-project:
-	cmake --build $(BUILD)
+project: init
+	cmake --build $(BUILD) --config Release
 
-start:
+start: project
 	./$(BUILD)/$(PROJECT)
 
-documentation:
+documentation: project
 	cmake --build $(BUILD) --target docs
 
-test:
+test: project
 	ctest --test-dir $(BUILD)
+
+pack: project documentation
+	cpack -G ZIP --config $(BUILD)/CPackConfig.cmake
 
 clean:
 	rm -rf $(BUILD)
