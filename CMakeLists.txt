@@ -35,37 +35,37 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 find_package(Doxygen)
 
 if (DOXYGEN_FOUND)
-    # Define the output directory as the project root's docs folder
-    set(DOXYGEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/docs)
+  # Define the output directory as the project root's docs folder
+  set(DOXYGEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/docs)
 
-    # Input Doxyfile and output Doxyfile in build directory
-    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+  # Input Doxyfile and output Doxyfile in build directory
+  set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-    # Customize Doxyfile with the output directory
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+  # Customize Doxyfile with the output directory
+  configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
-    # Create the docs directory if it doesn't exist
-    file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
+  # Create the docs directory if it doesn't exist
+  file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
 
-    add_custom_target(docs
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating Doxygen documentation in ${DOXYGEN_OUTPUT_DIR}"
-        VERBATIM
-    )
+  add_custom_target(docs
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating Doxygen documentation in ${DOXYGEN_OUTPUT_DIR}"
+    VERBATIM
+  )
 
-    install(DIRECTORY ${DOXYGEN_OUTPUT_DIR}/html/
-      DESTINATION docs
-      COMPONENT docs
-    )
+  install(DIRECTORY ${DOXYGEN_OUTPUT_DIR}/html/
+    DESTINATION docs
+    COMPONENT docs
+  )
 
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/
-      DESTINATION bin/data
-      COMPONENT runtime
-    )
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/
+    DESTINATION bin/data
+    COMPONENT runtime
+  )
 else()
-    message(WARNING "Doxygen not found, documentation target will not be available")
+  message(WARNING "Doxygen not found, documentation target will not be available")
 endif()
 
 # <<< Doxygen setup
