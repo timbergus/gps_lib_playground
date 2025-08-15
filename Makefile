@@ -18,8 +18,8 @@ documentation: project
 test: project
 	ctest --test-dir $(BUILD)
 
-pack: project documentation
+package: project documentation
 	cpack -G ZIP --config $(BUILD)/CPackConfig.cmake
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(BUILD) .cache docs _CPack* *.zip

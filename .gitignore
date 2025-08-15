@@ -1,8 +1,9 @@
-.cache
-.vscode
+.vscode/
+.cache/
 .DS_Store
-build
+build/
 docs/html
 docs/latex
 data/*.json
 _CPack*
+*.zip
